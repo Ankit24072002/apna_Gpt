@@ -10,14 +10,18 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Middleware
+// ✅ CORS middleware - put it BEFORE routes
+app.use(cors({
+    origin: 'https://apna-gpt-1.onrender.com', // Replace with your live frontend URL
+    credentials: true // needed if you use cookies/JWT
+}));
+
+// Middleware to parse JSON
 app.use(express.json());
-app.use(cors());
 
 // Routes
 app.use("/api", chatRoutes);
 app.use("/api/auth", authRoutes);
-
 
 // Root route
 app.get("/", (req, res) => {
