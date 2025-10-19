@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import "../styles/Register.css"; // ✅ correct path
+import "../Styles/Register.css"; 
 
 
 const Register = () => {
