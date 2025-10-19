@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
-import "../styles/login.css"; // ✅ correct path
+import "../Styles/login.css"; // ✅ correct path
 
 
 const Login = () => {
