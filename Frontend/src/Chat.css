@@ -1,0 +1,96 @@
+.chats {
+    max-width: 700px;
+    overflow-y: scroll;
+    padding: 8rem;
+}
+
+.userDiv {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.9rem;
+}
+
+
+.gptDiv {
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.userMessage {
+    background-color: #323232;
+    padding: 10px 20px;
+    border-radius: 14px;
+    margin-left: 15rem;
+    max-width: 500px;
+    width: fit-content;
+}
+
+.hljs {
+    border-radius: 14px !important;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+.assistantMessage {
+    position: relative;
+    display: inline-block;
+}
+
+.copyIcon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    cursor: pointer;
+    color: #10b981;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.copyIcon:hover {
+    opacity: 1;
+}
+.codeBlockWrapper {
+    position: relative;
+}
+
+.copyCodeIcon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    color: #10b981;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.copyCodeIcon:hover {
+    opacity: 1;
+}
+.codeBlockWrapper {
+    position: relative;
+}
+
+.copyCodeIcon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    color: #10b981;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.copyCodeIcon:hover {
+    opacity: 1;
+}
+
+/* Optional: improve code block styling */
+pre {
+    background-color: #0d1117; /* dark background */
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+

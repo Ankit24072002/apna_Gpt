@@ -1,0 +1,55 @@
+/* login.css */
+
+/* Smooth font and background transition */
+body {
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.5s, color 0.5s;
+  background: linear-gradient(135deg, #1f2937, #4b5563); /* nice gradient for dark mode */
+}
+
+/* Glassmorphism effect for the login container */
+.login-container {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.1); /* light transparency */
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease-in-out;
+}
+.login-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Input fields glow effect */
+.login-container input {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transition: all 0.3s;
+}
+.login-container input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+.login-container input:focus {
+  border-color: #10b981; /* green */
+  box-shadow: 0 0 10px #10b981;
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Button hover effect */
+.login-container button {
+  transition: all 0.3s ease-in-out;
+}
+.login-container button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.5); /* green shadow */
+}
+
+/* Register link hover */
+.login-container p span:hover {
+  text-decoration: underline;
+  color: #34d399; /* lighter green */
+  transition: 0.3s;
+}
