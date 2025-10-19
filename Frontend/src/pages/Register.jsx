@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import "../pages/Register.css";
+import "../styles/Register.css"; // ✅ correct path
+
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
