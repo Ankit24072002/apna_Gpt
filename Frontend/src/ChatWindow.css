@@ -2,157 +2,134 @@
 .chatWindow {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* chat grows upwards */
   height: 100vh;
-  width: 100%;
-  background-color: #212121;
+  background-color: #111; /* ChatGPT dark theme */
   color: #fff;
   font-family: 'Arial', sans-serif;
   position: relative;
+  overflow: hidden;
 }
 
 /* =================== Navbar =================== */
 .navbar {
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 12px 20px;
   background-color: #1a1a1a;
   border-bottom: 1px solid #333;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.navbar span {
-  font-size: 1.2rem;
+  z-index: 100;
 }
 
 .userIconDiv {
   cursor: pointer;
 }
 
-.userIcon {
-  background-color: #339cff;
-  height: 35px;
-  width: 35px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* =================== Dropdown =================== */
 .dropDown {
   position: absolute;
-  top: 4rem;
-  right: 1rem;
-  width: 160px;
-  background-color: #323232;
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  text-align: left;
+  top: 60px;
+  right: 20px;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 200px;
   z-index: 1000;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dropDownItem {
-  font-size: 0.9rem;
-  margin: 0.3rem 0;
-  padding: 0.5rem 0.2rem;
+  padding: 10px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .dropDownItem:hover {
-  background-color: rgba(180, 180, 180, 0.1);
-  border-radius: 6px;
+  background-color: #333;
 }
 
 /* =================== Chat Content =================== */
 .chatContent {
   flex: 1;
   overflow-y: auto;
-  padding: 15px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 80px; /* space for floating input on mobile */
+  scroll-behavior: smooth;
+  margin-bottom: 80px; /* space for input bar */
 }
 
 /* =================== Chat Bubbles =================== */
 .userDiv {
   align-self: flex-end;
   background-color: #4a90e2;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 20px;
-  max-width: 70%;
+  max-width: 75%;
   word-wrap: break-word;
 }
 
 .gptDiv {
   align-self: flex-start;
   background-color: #222;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 20px;
-  max-width: 70%;
+  max-width: 75%;
   word-wrap: break-word;
 }
 
 /* =================== Chat Input =================== */
 .chatInput {
-  width: 100%;
-  position: fixed; /* floating at bottom */
+  position: fixed;
   bottom: 0;
   left: 0;
-  padding: 10px 15px;
+  width: 100%;
   background-color: #1a1a1a;
+  border-top: 1px solid #333;
+  padding: 10px 20px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  border-top: 1px solid #333;
-  z-index: 100;
+  z-index: 200;
 }
 
 .inputBox {
+  display: flex;
   width: 100%;
   max-width: 700px;
-  position: relative;
-  display: flex;
+  gap: 10px;
 }
 
 .inputBox input {
-  width: 100%;
-  padding: 15px 50px 15px 20px; /* extra space for submit button */
-  font-size: 0.9rem;
-  border-radius: 14px;
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 20px;
   border: none;
   outline: none;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #222;
   color: #fff;
+  font-size: 0.9rem;
 }
 
 .inputBox #submit {
-  position: absolute;
-  right: 10px;
-  height: 35px;
-  width: 35px;
-  font-size: 18px;
+  background-color: #4a90e2;
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #4a90e2;
 }
 
 .inputBox #submit:hover {
-  color: #fff;
+  background-color: #357ab8;
 }
 
 .info {
   font-size: 0.75rem;
-  padding: 0.5rem;
   color: #b4b4b4;
+  margin-top: 5px;
   text-align: center;
 }
 
@@ -167,38 +144,53 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 200;
+  z-index: 300;
 }
 
 /* =================== Responsive =================== */
 @media screen and (max-width: 768px) {
+  .chatContent {
+    padding: 15px;
+    margin-bottom: 70px;
+  }
+
   .userDiv, .gptDiv {
     max-width: 90%;
+    font-size: 0.85rem;
+    padding: 10px 14px;
   }
 
   .inputBox input {
     font-size: 0.85rem;
+    padding: 10px 12px;
   }
 
   .inputBox #submit {
-    height: 30px;
-    width: 30px;
-    font-size: 16px;
+    padding: 8px 12px;
   }
 }
 
 @media screen and (max-width: 480px) {
   .chatContent {
     padding: 10px;
-    margin-bottom: 70px; /* space for floating input */
+    margin-bottom: 60px;
+  }
+
+  .userDiv, .gptDiv {
+    font-size: 0.8rem;
+    padding: 8px 12px;
   }
 
   .inputBox input {
     font-size: 0.8rem;
+    padding: 8px 10px;
   }
 
-  .dropDown {
-    top: 3.5rem;
-    right: 5px;
+  .inputBox #submit {
+    padding: 6px 10px;
+  }
+
+  .info {
+    font-size: 0.65rem;
   }
 }
