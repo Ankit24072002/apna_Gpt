@@ -5,18 +5,23 @@ import mongoose from "mongoose";
 import chatRoutes from "./routes/chat.js";
 import authRoutes from "./routes/auth.js";
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// ✅ CORS middleware - put it BEFORE routes
-app.use(cors({
-    origin: 'https://apna-gpt-1.onrender.com', // Replace with your live frontend URL
-    credentials: true // needed if you use cookies/JWT
-}));
+// ✅ Correct CORS setup — must come BEFORE routes
+app.use(
+  cors({
+    origin: [
+      "https://apna-gpt.onrender.com", // your live frontend
+      "http://localhost:3000"          // for local testing
+    ],
+    credentials: true,
+  })
+);
 
-// Middleware to parse JSON
+// Middleware
 app.use(express.json());
 
 // Routes
@@ -25,24 +30,22 @@ app.use("/api/auth", authRoutes);
 
 // Root route
 app.get("/", (req, res) => {
-    res.send("Server is running...");
+  res.send("✅ Apna GPT Backend is running...");
 });
 
-// Start server and connect to DB
+// MongoDB connection + start server
 const startServer = async () => {
-    try {
-        // Connect to MongoDB
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log("✅ Connected to MongoDB!");
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ Connected to MongoDB!");
 
-        // Start Express server
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
-        });
-    } catch (err) {
-        console.error("❌ Failed to connect to MongoDB:", err.message);
-        process.exit(1); // Exit process if DB connection fails
-    }
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB Connection Failed:", err.message);
+    process.exit(1);
+  }
 };
 
 startServer();

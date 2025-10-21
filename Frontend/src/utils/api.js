@@ -1,10 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "https://apna-gpt-1.onrender.com/api", // ✅ use deployed backend
+  withCredentials: true, // ✅ allow sending cookies/tokens
 });
 
-// Automatically attach JWT to every request if user logged in
+// Automatically attach JWT if available
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
