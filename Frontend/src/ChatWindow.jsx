@@ -4,15 +4,34 @@ import { MyContext } from "./MyContext.jsx";
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
+import API from "../utils/api"; // your axios instance pointing to live backend
 
 function ChatWindow() {
-    const { prompt, setPrompt, reply, setReply, currThreadId, setPrevChats, setNewChat } =
-        useContext(MyContext);
+    const {
+        prompt,
+        setPrompt,
+        reply,
+        setReply,
+        currThreadId,
+        setCurrThreadId,
+        setPrevChats,
+        setNewChat,
+    } = useContext(MyContext);
+
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const chatContentRef = useRef(null); // Ref for chat scroll
+    const chatContentRef = useRef(null);
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
+
+    // Ensure threadId exists (important for mobile)
+    useEffect(() => {
+        if (!currThreadId) {
+            const newThreadId = Date.now().toString();
+            setCurrThreadId(newThreadId);
+            localStorage.setItem("threadId", newThreadId);
+        }
+    }, [currThreadId]);
 
     const getReply = async () => {
         if (!prompt.trim()) return;
@@ -20,13 +39,11 @@ function ChatWindow() {
         setNewChat(false);
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: prompt, threadId: currThreadId }),
+            const res = await API.post("/chat", {
+                message: prompt,
+                threadId: currThreadId,
             });
-            const res = await response.json();
-            setReply(res.reply || "❌ No response from server");
+            setReply(res.data.reply || "❌ No response from server");
         } catch (err) {
             console.error(err);
             setReply("❌ Error: Could not get response from server.");
@@ -38,16 +55,16 @@ function ChatWindow() {
     // Append new chat to prevChats
     useEffect(() => {
         if (prompt && reply) {
-            setPrevChats(prevChats => ([
-                ...prevChats,
+            setPrevChats((prev) => [
+                ...prev,
                 { role: "user", content: prompt },
                 { role: "assistant", content: reply },
-            ]));
+            ]);
         }
         setPrompt("");
     }, [reply]);
 
-    // Auto-scroll to bottom when new messages arrive
+    // Auto-scroll
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [reply]);
@@ -60,6 +77,7 @@ function ChatWindow() {
         setPrompt("");
         setReply("");
         setNewChat(true);
+        localStorage.removeItem("threadId");
         navigate("/login");
     };
 
@@ -74,7 +92,7 @@ function ChatWindow() {
             </div>
 
             {/* Dropdown */}
-            {isOpen &&
+            {isOpen && (
                 <div className="dropDown">
                     <div className="dropDownItem"><i className="fa-solid fa-gear"></i> Settings</div>
                     <div className="dropDownItem"><i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
@@ -82,10 +100,14 @@ function ChatWindow() {
                         <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
                     </div>
                 </div>
-            }
+            )}
 
-            {/* Chat Messages - Scrollable */}
-            <div className="chatContent" ref={chatContentRef} style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}>
+            {/* Chat messages */}
+            <div
+                className="chatContent"
+                ref={chatContentRef}
+                style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}
+            >
                 <Chat />
                 <div ref={chatEndRef} />
             </div>
@@ -100,7 +122,7 @@ function ChatWindow() {
                         placeholder="Ask anything"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && getReply()}
+                        onKeyDown={(e) => e.key === "Enter" && getReply()}
                     />
                     <div id="submit" onClick={getReply}><i className="fa-solid fa-paper-plane"></i></div>
                 </div>
