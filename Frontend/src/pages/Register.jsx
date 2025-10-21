@@ -3,7 +3,6 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import "../Styles/Register.css"; 
 
 
-
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -33,34 +32,41 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (passwordStrength === "Weak") {
-      alert("❌ Password too weak!");
-      return;
+  e.preventDefault();
+  if (passwordStrength === "Weak") {
+    alert("❌ Password too weak!");
+    return;
+  }
+  setLoading(true);
+
+  try {
+    const API_URL = "https://apna-gpt.onrender.com/api/auth/register"; // <-- updated
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Registered successfully!");
+      setForm({ name: "", email: "", password: "" });
+      setPasswordStrength("");
+      // Optional: redirect to login page
+      window.location.href = "/login";
+    } else {
+      // Show error message returned from backend
+      alert(`❌ ${data.message || "Registration failed"}`);
     }
-    setLoading(true);
-    try {
-      const API_URL = "https://apna-gpt-1.onrender.com/api/auth/register";
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ Registered successfully!");
-        setForm({ name: "", email: "", password: "" });
-        setPasswordStrength("");
-      } else {
-        alert(`❌ ${data.message || "Registration failed"}`);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error("Server Error:", error);
+    alert("❌ Server error. Please try again later.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Particle background effect
   useEffect(() => {
