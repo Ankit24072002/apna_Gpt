@@ -4,7 +4,7 @@ import { MyContext } from "./MyContext.jsx";
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
-import API from "../utils/api"; // your axios instance pointing to live backend
+import API from '@utils/api' // your axios instance pointing to live backend
 
 function ChatWindow() {
     const {
