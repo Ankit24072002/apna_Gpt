@@ -26,13 +26,12 @@ function ChatWindow() {
 
     // Ensure threadId exists (important for mobile)
     useEffect(() => {
-        if (!currThreadId) {
-            const newThreadId = Date.now().toString();
-            setCurrThreadId(newThreadId);
-            localStorage.setItem("threadId", newThreadId);
-        }
-    }, [currThreadId]);
-
+    if (!currThreadId) {
+        const newThreadId = Date.now().toString();
+        setCurrThreadId(newThreadId);
+        localStorage.setItem("threadId", newThreadId);
+    }
+}, [currThreadId]);
     const getReply = async () => {
         if (!prompt.trim()) return;
         setLoading(true);
@@ -40,9 +39,9 @@ function ChatWindow() {
 
         try {
             const res = await API.post("/chat", {
-                message: prompt,
-                threadId: currThreadId,
-            });
+           message: prompt,
+           threadId: currThreadId,
+        });
             setReply(res.data.reply || "❌ No response from server");
         } catch (err) {
             console.error(err);
