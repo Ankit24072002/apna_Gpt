@@ -1,4 +1,5 @@
 **CloneGPT** 
+
 CloneGPT is a real-time AI chat application inspired by ChatGPT. It allows users to send messages and receive AI-powered responses in a responsive, dark-themed chat interface.
 
 **1.Features**
@@ -26,11 +27,13 @@ API: Custom AI chat API / OpenAI integration
 
 ***Deployment: Render (Frontend & Backend)***
 
+
 Setup Instructions
 
 Clone the repository:
 
 git clone https://github.com/Ankit24072002/apna_Gpt.git
+
 cd apna_Gpt
 
 
