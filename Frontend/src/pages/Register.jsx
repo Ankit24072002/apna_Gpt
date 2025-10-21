@@ -40,27 +40,32 @@ const Register = () => {
   setLoading(true);
 
   try {
-    const API_URL = "https://apna-gpt.onrender.com/api/auth/register"; // <-- updated
+    const API_URL = "https://apna-gpt.onrender.com/api/auth/register";
+
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
 
-    const data = await res.json();
+    let data = {};
+    try {
+      const text = await res.text();
+      data = text ? JSON.parse(text) : {};
+    } catch (err) {
+      console.error("Failed to parse JSON:", err);
+      data = {};
+    }
 
     if (res.ok) {
       alert("✅ Registered successfully!");
       setForm({ name: "", email: "", password: "" });
       setPasswordStrength("");
-      // Optional: redirect to login page
-      window.location.href = "/login";
     } else {
-      // Show error message returned from backend
       alert(`❌ ${data.message || "Registration failed"}`);
     }
   } catch (error) {
-    console.error("Server Error:", error);
+    console.error("Server error:", error);
     alert("❌ Server error. Please try again later.");
   } finally {
     setLoading(false);
