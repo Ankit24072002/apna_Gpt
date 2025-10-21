@@ -4,7 +4,7 @@ import { MyContext } from "./MyContext.jsx";
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
-import API from '@utils/api' // your axios instance pointing to live backend
+import API from "@utils/api"; // axios instance pointing to live backend
 
 function ChatWindow() {
     const {
@@ -20,18 +20,22 @@ function ChatWindow() {
 
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const chatContentRef = useRef(null);
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
 
-    // Ensure threadId exists (important for mobile)
+    // Ensure threadId exists (mobile & laptop)
     useEffect(() => {
-    if (!currThreadId) {
-        const newThreadId = Date.now().toString();
-        setCurrThreadId(newThreadId);
-        localStorage.setItem("threadId", newThreadId);
-    }
-}, [currThreadId]);
+        let storedThreadId = localStorage.getItem("threadId");
+        if (!currThreadId && !storedThreadId) {
+            const newThreadId = Date.now().toString();
+            setCurrThreadId(newThreadId);
+            localStorage.setItem("threadId", newThreadId);
+        } else if (storedThreadId && !currThreadId) {
+            setCurrThreadId(storedThreadId);
+        }
+    }, [currThreadId, setCurrThreadId]);
+
+    // Send message and get reply
     const getReply = async () => {
         if (!prompt.trim()) return;
         setLoading(true);
@@ -39,9 +43,9 @@ function ChatWindow() {
 
         try {
             const res = await API.post("/chat", {
-           message: prompt,
-           threadId: currThreadId,
-        });
+                message: prompt,
+                threadId: currThreadId,
+            });
             setReply(res.data.reply || "❌ No response from server");
         } catch (err) {
             console.error(err);
@@ -63,20 +67,23 @@ function ChatWindow() {
         setPrompt("");
     }, [reply]);
 
-    // Auto-scroll
+    // Auto-scroll to bottom
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [reply]);
 
+    // Navbar dropdown
     const handleProfileClick = () => setIsOpen(!isOpen);
 
+    // Logout
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("threadId");
         setPrevChats([]);
         setPrompt("");
         setReply("");
         setNewChat(true);
-        localStorage.removeItem("threadId");
+        setCurrThreadId(null);
         navigate("/login");
     };
 
@@ -102,16 +109,12 @@ function ChatWindow() {
             )}
 
             {/* Chat messages */}
-            <div
-                className="chatContent"
-                ref={chatContentRef}
-                style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}
-            >
+            <div className="chatContent" style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}>
                 <Chat />
                 <div ref={chatEndRef} />
             </div>
 
-            {/* Loading */}
+            {/* Loading overlay */}
             {loading && <div className="loadingOverlay"><ScaleLoader color="#fff" loading={loading} /></div>}
 
             {/* Input */}
