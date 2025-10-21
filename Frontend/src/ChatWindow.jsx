@@ -1,19 +1,15 @@
 import "./ChatWindow.css";
 import Chat from "./Chat.jsx";
 import { MyContext } from "./MyContext.jsx";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
-import API from "@utils/api"; // axios instance pointing to live backend
 
 function ChatWindow() {
   const {
     prompt,
     setPrompt,
-    reply,
-    setReply,
     currThreadId,
-    setCurrThreadId,
     setPrevChats,
     setNewChat,
   } = useContext(MyContext);
@@ -23,54 +19,45 @@ function ChatWindow() {
   const chatEndRef = useRef(null);
   const navigate = useNavigate();
 
-  // Ensure threadId exists for each session
-  useEffect(() => {
-    let storedThreadId = localStorage.getItem("threadId");
-    if (!storedThreadId) {
-      storedThreadId = Date.now().toString();
-      localStorage.setItem("threadId", storedThreadId);
-    }
-    setCurrThreadId(storedThreadId);
-  }, [setCurrThreadId]);
-
+  // Send message and get reply
   const getReply = async () => {
-    if (!prompt.trim()) return;
+    const currentPrompt = prompt.trim();
+    if (!currentPrompt) return;
+
     setLoading(true);
     setNewChat(false);
+    setPrompt(""); // clear input immediately
 
     try {
-      const res = await API.post("/chat", {
-        message: prompt,
-        threadId: currThreadId,
+      const response = await fetch("https://apna-gpt.onrender.com/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: currentPrompt, threadId: currThreadId }),
       });
-      setReply(res.data.reply || "❌ No response from server");
+
+      const res = await response.json();
+      const assistantReply = res.reply || "❌ No response from server";
+
+      setPrevChats(prev => ([
+        ...prev,
+        { role: "user", content: currentPrompt },
+        { role: "assistant", content: assistantReply },
+      ]));
+
     } catch (err) {
-      console.error(
-        "Server Error:",
-        err.response ? err.response.data : err.message
-      );
-      setReply("❌ Error: Could not get response from server.");
+      console.error(err);
+      const errorMsg = "❌ Error: Could not get response from server.";
+      setPrevChats(prev => ([
+        ...prev,
+        { role: "user", content: currentPrompt },
+        { role: "assistant", content: errorMsg },
+      ]));
     }
 
     setLoading(false);
+    // Scroll to bottom
+    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
   };
-
-  // Append new chat to prevChats
-  useEffect(() => {
-    if (prompt && reply) {
-      setPrevChats((prev) => [
-        ...prev,
-        { role: "user", content: prompt },
-        { role: "assistant", content: reply },
-      ]);
-      setPrompt("");
-    }
-  }, [reply, prompt, setPrevChats, setPrompt]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [reply]);
 
   const handleProfileClick = () => setIsOpen(!isOpen);
 
@@ -79,7 +66,6 @@ function ChatWindow() {
     localStorage.removeItem("threadId");
     setPrevChats([]);
     setPrompt("");
-    setReply("");
     setNewChat(true);
     navigate("/login");
   };
@@ -88,62 +74,45 @@ function ChatWindow() {
     <div className="chatWindow">
       {/* Navbar */}
       <div className="navbar">
-        <span>
-          CloneGpt <i className="fa-solid fa-chevron-down"></i>
-        </span>
+        <span>CloneGPT <i className="fa-solid fa-chevron-down"></i></span>
         <div className="userIconDiv" onClick={handleProfileClick}>
-          <span className="userIcon">
-            <i className="fa-solid fa-user"></i>
-          </span>
+          <span className="userIcon"><i className="fa-solid fa-user"></i></span>
         </div>
       </div>
 
       {/* Dropdown */}
       {isOpen && (
         <div className="dropDown">
-          <div className="dropDownItem">
-            <i className="fa-solid fa-gear"></i> Settings
-          </div>
-          <div className="dropDownItem">
-            <i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan
-          </div>
+          <div className="dropDownItem"><i className="fa-solid fa-gear"></i> Settings</div>
+          <div className="dropDownItem"><i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
           <div className="dropDownItem" onClick={handleLogout}>
             <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
           </div>
         </div>
       )}
 
-      {/* Chat messages */}
-      <div
-        className="chatContent"
-        style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}
-      >
+      {/* Chat content */}
+      <div className="chatContent">
         <Chat />
         <div ref={chatEndRef} />
       </div>
 
       {/* Loading */}
-      {loading && (
-        <div className="loadingOverlay">
-          <ScaleLoader color="#fff" loading={loading} />
-        </div>
-      )}
+      {loading && <div className="loadingOverlay"><ScaleLoader color="#fff" loading={loading} /></div>}
 
       {/* Input */}
       <div className="chatInput">
         <div className="inputBox">
           <input
-            placeholder="Ask anything"
+            placeholder="Ask anything..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && getReply()}
+            onKeyDown={(e) => e.key === 'Enter' && getReply()}
           />
-          <div id="submit" onClick={getReply}>
-            <i className="fa-solid fa-paper-plane"></i>
-          </div>
+          <div id="submit" onClick={getReply}><i className="fa-solid fa-paper-plane"></i></div>
         </div>
         <p className="info">
-          CloneGPT can make mistakes. Check important info. See Cookie Preferences.
+          CloneGPT can make mistakes. Verify critical info.
         </p>
       </div>
     </div>
