@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://apna-gpt-1.onrender.com/api", // ✅ use deployed backend
-  withCredentials: true, // ✅ allow sending cookies/tokens
+  baseURL: "https://apna-gpt-1.onrender.com/api",
 });
 
 // Automatically attach JWT if available

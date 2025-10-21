@@ -11,15 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ✅ Correct CORS setup — must come BEFORE routes
-app.use(
-  cors({
-    origin: [
-      "https://apna-gpt.onrender.com", // your live frontend
-      "http://localhost:3000"          // for local testing
-    ],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: ["https://apna-gpt.onrender.com", "https://apna-gpt-1.onrender.com"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
 
 // Middleware
 app.use(express.json());
