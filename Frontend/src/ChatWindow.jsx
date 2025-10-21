@@ -7,133 +7,127 @@ import { ScaleLoader } from "react-spinners";
 import API from "@utils/api"; // axios instance pointing to live backend
 
 function ChatWindow() {
-    const {
-        prompt,
-        setPrompt,
-        reply,
-        setReply,
-        currThreadId,
-        setCurrThreadId,
-        setPrevChats,
-        setNewChat,
-    } = useContext(MyContext);
+  const {
+    prompt,
+    setPrompt,
+    reply,
+    setReply,
+    currThreadId,
+    setCurrThreadId,
+    setPrevChats,
+    setNewChat,
+  } = useContext(MyContext);
 
-    const [loading, setLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
-    const chatEndRef = useRef(null);
-    const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const chatEndRef = useRef(null);
+  const navigate = useNavigate();
 
-    // Ensure threadId exists (mobile & laptop)
-    useEffect(() => {
-        let storedThreadId = localStorage.getItem("threadId");
-        if (!currThreadId && !storedThreadId) {
-            const newThreadId = Date.now().toString();
-            setCurrThreadId(newThreadId);
-            localStorage.setItem("threadId", newThreadId);
-        } else if (storedThreadId && !currThreadId) {
-            setCurrThreadId(storedThreadId);
-        }
-    }, [currThreadId, setCurrThreadId]);
+  // Ensure a threadId exists for each session
+  useEffect(() => {
+    let storedThreadId = localStorage.getItem("threadId");
+    if (!storedThreadId) {
+      storedThreadId = Date.now().toString();
+      localStorage.setItem("threadId", storedThreadId);
+    }
+    setCurrThreadId(storedThreadId);
+  }, []);
 
-    // Send message and get reply
-    const getReply = async () => {
-        if (!prompt.trim()) return;
-        setLoading(true);
-        setNewChat(false);
+  const getReply = async () => {
+    if (!prompt.trim()) return;
+    setLoading(true);
+    setNewChat(false);
 
-        try {
-            const res = await API.post("/chat", {
-                message: prompt,
-                threadId: currThreadId,
-            });
-            setReply(res.data.reply || "❌ No response from server");
-        } catch (err) {
-            console.error(err);
-            setReply("❌ Error: Could not get response from server.");
-        }
+    try {
+      const res = await API.post("/chat", {
+        message: prompt,
+        threadId: currThreadId,
+      });
+      setReply(res.data.reply || "❌ No response from server");
+    } catch (err) {
+      console.error("Server Error:", err.response ? err.response.data : err.message);
+      setReply("❌ Error: Could not get response from server.");
+    }
 
-        setLoading(false);
-    };
+    setLoading(false);
+  };
 
-    // Append new chat to prevChats
-    useEffect(() => {
-        if (prompt && reply) {
-            setPrevChats((prev) => [
-                ...prev,
-                { role: "user", content: prompt },
-                { role: "assistant", content: reply },
-            ]);
-        }
-        setPrompt("");
-    }, [reply]);
+  // Append new chat to prevChats
+  useEffect(() => {
+    if (prompt && reply) {
+      setPrevChats((prev) => [
+        ...prev,
+        { role: "user", content: prompt },
+        { role: "assistant", content: reply },
+      ]);
+      setPrompt("");
+    }
+  }, [reply]);
 
-    // Auto-scroll to bottom
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [reply]);
+  // Auto-scroll to bottom
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [reply]);
 
-    // Navbar dropdown
-    const handleProfileClick = () => setIsOpen(!isOpen);
+  const handleProfileClick = () => setIsOpen(!isOpen);
 
-    // Logout
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("threadId");
-        setPrevChats([]);
-        setPrompt("");
-        setReply("");
-        setNewChat(true);
-        setCurrThreadId(null);
-        navigate("/login");
-    };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("threadId");
+    setPrevChats([]);
+    setPrompt("");
+    setReply("");
+    setNewChat(true);
+    navigate("/login");
+  };
 
-    return (
-        <div className="chatWindow">
-            {/* Navbar */}
-            <div className="navbar">
-                <span>CloneGpt <i className="fa-solid fa-chevron-down"></i></span>
-                <div className="userIconDiv" onClick={handleProfileClick}>
-                    <span className="userIcon"><i className="fa-solid fa-user"></i></span>
-                </div>
-            </div>
-
-            {/* Dropdown */}
-            {isOpen && (
-                <div className="dropDown">
-                    <div className="dropDownItem"><i className="fa-solid fa-gear"></i> Settings</div>
-                    <div className="dropDownItem"><i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
-                    <div className="dropDownItem" onClick={handleLogout}>
-                        <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
-                    </div>
-                </div>
-            )}
-
-            {/* Chat messages */}
-            <div className="chatContent" style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}>
-                <Chat />
-                <div ref={chatEndRef} />
-            </div>
-
-            {/* Loading overlay */}
-            {loading && <div className="loadingOverlay"><ScaleLoader color="#fff" loading={loading} /></div>}
-
-            {/* Input */}
-            <div className="chatInput">
-                <div className="inputBox">
-                    <input
-                        placeholder="Ask anything"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && getReply()}
-                    />
-                    <div id="submit" onClick={getReply}><i className="fa-solid fa-paper-plane"></i></div>
-                </div>
-                <p className="info">
-                    CloneGPT can make mistakes. Check important info. See Cookie Preferences.
-                </p>
-            </div>
+  return (
+    <div className="chatWindow">
+      {/* Navbar */}
+      <div className="navbar">
+        <span>CloneGpt <i className="fa-solid fa-chevron-down"></i></span>
+        <div className="userIconDiv" onClick={handleProfileClick}>
+          <span className="userIcon"><i className="fa-solid fa-user"></i></span>
         </div>
-    );
+      </div>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="dropDown">
+          <div className="dropDownItem"><i className="fa-solid fa-gear"></i> Settings</div>
+          <div className="dropDownItem"><i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
+          <div className="dropDownItem" onClick={handleLogout}>
+            <i className="fa-solid fa-arrow-right-from-bracket"></i> Log out
+          </div>
+        </div>
+      )}
+
+      {/* Chat messages */}
+      <div className="chatContent" style={{ overflowY: "auto", height: "calc(100vh - 160px)", padding: "10px" }}>
+        <Chat />
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* Loading */}
+      {loading && <div className="loadingOverlay"><ScaleLoader color="#fff" loading={loading} /></div>}
+
+      {/* Input */}
+      <div className="chatInput">
+        <div className="inputBox">
+          <input
+            placeholder="Ask anything"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && getReply()}
+          />
+          <div id="submit" onClick={getReply}><i className="fa-solid fa-paper-plane"></i></div>
+        </div>
+        <p className="info">
+          CloneGPT can make mistakes. Check important info. See Cookie Preferences.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default ChatWindow;
