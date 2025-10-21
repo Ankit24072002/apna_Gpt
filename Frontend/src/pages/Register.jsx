@@ -3,6 +3,7 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import "../Styles/Register.css"; 
 
 
+
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
